@@ -28,6 +28,11 @@
                 "file": "fonts/UbuntuMono-Regular.ttf",
                 "name": "MONO_FONT_14",
                 "type": "font"
+            },
+            {
+                "file": "images/garage-door.png",
+                "name": "IMAGES_GARAGE_DOOR_PNG",
+                "type": "png"
             }
         ]
     },

@@ -9,7 +9,7 @@ var Vector2 = require('vector2');
 
 var main = new UI.Card({
   title: 'Pebble.js',
-  icon: 'images/menu_icon.png',
+  icon: 'images/garage-door.png',
   subtitle: 'Hello World!',
   body: 'Press any button.'
 });
