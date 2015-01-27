@@ -88,20 +88,23 @@ main.on('click', 'select', function(e) {
 main.on('click', 'down', function(e) {
   var card = new UI.Card();
 
-  ajax(
-    { url: baseUrl + '/Membership/ValidateUserWithCulture?appId=' + appId + '&securityToken=null&username=' + encodeURI(emailAddress) + '&password=' + encodeURI(password) + '&culture=en', type: 'json' },
-    function(data) {
-      console.log('log in successful');
-      card.title('Logged In');
-      card.subtitle(data.UserId);
-      card.body(data.SecurityToken);
-      card.show();
-    },
-    function(error) {
-      console.log('log in error');
+  myQ.authenticate(emailAddress, password, function(data) {
+    console.log('success callback');
+    card.title('Logged In');
+    card.subtitle(data.UserId);
+    card.body(data.SecurityToken);
+    card.show();
+  }, function(data) {
+    console.log('failure callback');
+    card.title('Not Logged In');
+    card.subtitle('Ooops');
+    card.body('Email or password wrong.');
+    card.show();
+  }, function(error) {
+      console.log('error callback');
       card.title('Error!');
       card.subtitle('Error logging in');
-      card.body(error);
+      card.body('No idea why.');
       card.show();
     }
   );
