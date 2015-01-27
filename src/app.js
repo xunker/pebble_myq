@@ -23,6 +23,13 @@ var loadSettings = function() {
   console.log('password: ' + password);
 };
 
+var resetSettings = function() {
+  console.log('Resetting settings.');
+  Settings.option('emailAddress', null);
+  Settings.option('password', null);
+  console.log('Done resetting.');
+};
+
 var haveStoredCredentials = function() {
   return !!(emailAddress && password);
 };
@@ -55,17 +62,63 @@ var pleaseConfigureCard = new UI.Card({
 });
 
 var mainCard = new UI.Card({
-  title: 'Pebble.js',
+  title: 'Pebble MyQ',
   icon: 'images/garage-door.png',
   subtitle: 'Hello World!',
   body: 'Press any button.'
 });
+
+var authenticateUser = function() {
+  var authenticatingCard = new UI.Card({
+    subtitle: 'Logging in...'
+  });
+
+  authenticatingCard.show();
+
+  console.log('calling authenticate');
+  myQ.authenticate(emailAddress, password, function(data) {
+    console.log('success callback');
+    authenticatingCard.hide();
+  }, function(data) {
+    console.log('failure callback');
+    authenticatingCard.hide();
+
+    var msg = 'Unknown problem.';
+    if (data.ErrorMessage) {
+      msg = data.ErrorMessage;
+    }
+
+    var failureCard = new UI.Card({
+      subtitle: 'Problem logging in',
+      body: msg
+    });
+    
+    failureCard.show();
+  }, function(error) {
+      console.log('error callback');
+      authenticatingCard.hide();
+
+      var msg = 'Unknown problem.';
+      if (data.ErrorMessage) {
+        msg = data.ErrorMessage;
+      }
+      var errorCard = new UI.Card({
+        subtitle: 'Problem logging in',
+        body: msg
+      });
+
+      errorCard.show();
+    }
+  );
+
+};
 
 var main = function() {
   loadSettings();
   if (haveStoredCredentials()) {
     mainCard.show();
     pleaseConfigureCard.hide();
+    authenticateUser();
   } else {
     pleaseConfigureCard.show();
     mainCard.hide();
@@ -95,47 +148,45 @@ mainCard.on('click', 'up', function(e) {
 });
 
 mainCard.on('longClick', 'up', function(e) {
-  console.log('Resetting settings.');
-  Settings.option('emailAddress', null);
-  Settings.option('password', null);
-  console.log('Done resetting.');
+  resetSettings();
   main();
 });
 
 mainCard.on('click', 'select', function(e) {
-  var wind = new UI.Window();
-  var textfield = new UI.Text({
-    position: new Vector2(0, 50),
-    size: new Vector2(144, 30),
-    font: 'gothic-24-bold',
-    text: 'Text Anywhere!',
-    textAlign: 'center'
-  });
-  wind.add(textfield);
-  wind.show();
-});
-
-mainCard.on('click', 'down', function(e) {
   var card = new UI.Card();
-  console.log('calling authenticate');
-  myQ.authenticate(emailAddress, password, function(data) {
-    console.log('success callback');
-    card.title('Logged In');
-    card.subtitle(data.UserId);
-    card.body(data.SecurityToken);
+  console.log('calling getDevices');
+  myQ.getDevices(function(data) {
+    console.log('devices success callback');
+    card.title('Number of Devices');
+    card.body(data.Devices.length);
     card.show();
   }, function(data) {
-    console.log('failure callback');
-    card.title('Not Logged In');
-    card.subtitle('Ooops');
-    card.body('Email or password wrong.');
+    console.log('devices failure callback');
+    card.title('Problem getting devices');
     card.show();
   }, function(error) {
-      console.log('error callback');
+      console.log('devices error callback');
       card.title('Error!');
-      card.subtitle('Error logging in');
+      card.subtitle('Error getting devices');
       card.body('No idea why.');
       card.show();
     }
   );
+});
+
+// mainCard.on('click', 'select', function(e) {
+//   var wind = new UI.Window();
+//   var textfield = new UI.Text({
+//     position: new Vector2(0, 50),
+//     size: new Vector2(144, 30),
+//     font: 'gothic-24-bold',
+//     text: 'Text Anywhere!',
+//     textAlign: 'center'
+//   });
+//   wind.add(textfield);
+//   wind.show();
+// });
+
+mainCard.on('click', 'down', function(e) {
+  authenticateUser();
 });

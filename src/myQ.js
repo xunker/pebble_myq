@@ -33,25 +33,66 @@ myQ.prototype.authenticate = function(emailAddress, password, success_cb, failur
   console.log('myQ#authenticate');
   var authUrl = myQ.authenticateUrl(emailAddress, password);
   console.log('url: ' + authUrl);
+  // success and failure callbacks below are wrapped in closures
+  // so we can set securityToken on the instance of myQ.
   myQ.ajax(
     { url: authUrl, type: 'json' },
+    (function(_this){
+      return function(data) {
+        console.log('received log in response');
+        console.log(JSON.stringify(data));
+        if (data.SecurityToken) {
+          console.log('Log in successful');
+          _this.securityToken = data.SecurityToken;
+          success_cb(data);
+        } else {
+          console.log('Log in failure');
+          _this.securityToken = undefined;
+          failure_cb(data);
+        }
+      };
+    })(this),
+    (function(_this){
+      return function(msg) {
+        console.log(JSON.stringify(msg));
+        console.log('log in error');
+        this.securityToken = undefined;
+        error_cb(msg);
+      };
+    })(this)
+  );
+  return true;
+};
+
+myQ.devicesUrl = function(token) {
+  this.log('.authenticateUrl');
+  return this.baseUrl
+    + 'api/UserDeviceDetails?appId='
+    + this.appId
+    + '&securityToken='
+    + token;
+};
+
+myQ.prototype.getDevices = function(success_cb, failure_cb, error_cb) {
+  console.log('myQ#getDevices');
+  var devicesUrl = myQ.devicesUrl(this.securityToken);
+  console.log('url: ' + devicesUrl);
+  myQ.ajax(
+    { url: devicesUrl, type: 'json' },
     function(data) {
-      console.log('received log in response');
+      console.log('received devices response');
       console.log(JSON.stringify(data));
-      if (data.SecurityToken) {
-        console.log('Log in successful');
-        this.securityToken = data.SecurityToken;
+      if (data.ReturnCode == "0") {
+        console.log('got device list');
         success_cb(data);
       } else {
-        console.log('Log in failure');
-        this.securityToken = undefined;
+        console.log('no device list');
         failure_cb(data);
       }
     },
     function(msg) {
       console.log(JSON.stringify(msg));
-      console.log('log in error');
-      this.securityToken = undefined;
+      console.log('devices error');
       error_cb(msg);
     }
   );
