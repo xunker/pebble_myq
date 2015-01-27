@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Player" errors="0" tests="1" failures="1" time="0.005" timestamp="2015-01-26T21:30:58">
+  <testcase classname="Player" name="encountered a declaration exception" time="0.005"><failure type="expect" message="Error: Cannot find module &amp;apos;../src/Player.js&amp;apos;">Error: Cannot find module &amp;apos;../src/Player.js&amp;apos;
+    at Function.Module._resolveFilename (module.js:338:15)
+    at Function.Module._load (module.js:280:25)
+    at Module.require (module.js:364:17)
+    at require (module.js:380:17)
+    at null.&amp;lt;anonymous&amp;gt; (/Users/mnielsen/work/pebble_myq/spec/jasmine_examples/PlayerSpec.js:2:16)
+    at jasmine.Env.describe (/Users/mnielsen/work/pebble_myq/node_modules/grunt-jasmine-node/node_modules/jasmine-node/lib/jasmine-node/jasmine-1.3.1.js:819:21)
+    at describe (/Users/mnielsen/work/pebble_myq/node_modules/grunt-jasmine-node/node_modules/jasmine-node/lib/jasmine-node/jasmine-1.3.1.js:603:27)
+    at Object.&amp;lt;anonymous&amp;gt; (/Users/mnielsen/work/pebble_myq/spec/jasmine_examples/PlayerSpec.js:1:63)
+    at Module._compile (module.js:456:26)
+    at Object.Module._extensions..js (module.js:474:10)</failure></testcase>
+</testsuite>
+</testsuites>
