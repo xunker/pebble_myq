@@ -10,19 +10,19 @@ myQ.prototype.isAuthenticated = function() {
 
 myQ.prototype.authenticateUrl = function() {
   return this.baseUrl
-  + 'Membership/ValidateUserWithCulture?appId='
-  + this.appId
-  + '&securityToken=null&username='
-  + encodeURI(this.emailAddress)
-  + '&password='
-  + encodeURI(this.password)
-  + '&culture=en';
+    + 'Membership/ValidateUserWithCulture?appId='
+    + this.appId
+    + '&securityToken=null&username='
+    + encodeURI(this.emailAddress)
+    + '&password='
+    + encodeURI(this.password)
+    + '&culture=en';
 };
 
 myQ.prototype.authenticate = function(emailAddress, password, success, failure, error) {
   
   ajax(
-    { url: this.baseUrl + '/Membership/ValidateUserWithCulture?appId=' + this.appId + '&securityToken=null&username=' + encodeURI(this.emailAddress) + '&password=' + encodeURI(this.password) + '&culture=en', type: 'json' },
+    { url: this.authenticateUrl(), type: 'json' },
     function(data) {
       console.log('received log in response');
       if (data.SecurityToken) {
@@ -38,7 +38,7 @@ myQ.prototype.authenticate = function(emailAddress, password, success, failure, 
     function(error) {
       console.log('log in error');
       this.securityToken = undefined;
-      failure();
+      error();
     }
   );
 };

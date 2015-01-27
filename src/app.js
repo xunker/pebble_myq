@@ -8,9 +8,7 @@ var UI = require('ui');
 var Vector2 = require('vector2');
 var ajax = require('ajax');
 var Settings = require('settings');
-
-var appId = 'Vj8pQggXLhLy0WHahglCD4N1nAkkXQtGYpq2HrHD7H1nvmbT55KqtN6RSF4ILB%2fi';
-var baseUrl = 'https://myqexternal.myqdevice.com/';
+var myQ = new require('myQ')();
 
 var emailAddress = '';
 var password = '';
