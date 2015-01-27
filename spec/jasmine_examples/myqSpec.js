@@ -1,5 +1,6 @@
 describe("myQ", function() {
   var myQ = require('../../src/myQ.js');
+  myQ.log = function() {}; // silence logging
   var subject;
 
   beforeEach(function() {
@@ -23,19 +24,15 @@ describe("myQ", function() {
     });
   });
 
-  describe("#authenticateUrl()", function(){
+  describe(".authenticateUrl()", function(){
     var emailAddress = 'xxx@yyy.com';
     var password = 'p@ssw0rd';
 
-    beforeEach(function() {
-      subject.emailAddress = emailAddress;
-      subject.password = password;
-    });
-
     it('return a constructed url', function() {
-      expect(subject.authenticateUrl()).toEqual(
-        myQ.baseUrl + 'Membership/ValidateUserWithCulture?appId='
-          + myQ.appId
+      expect(myQ.authenticateUrl(emailAddress, password)).toEqual(
+        'https://myqexternal.myqdevice.com/'
+          + 'Membership/ValidateUserWithCulture?appId='
+          + 'Vj8pQggXLhLy0WHahglCD4N1nAkkXQtGYpq2HrHD7H1nvmbT55KqtN6RSF4ILB%2fi'
           + '&securityToken=null&username='
           + encodeURI(emailAddress)
           + '&password='

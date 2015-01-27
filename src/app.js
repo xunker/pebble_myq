@@ -6,9 +6,10 @@
 
 var UI = require('ui');
 var Vector2 = require('vector2');
-var ajax = require('ajax');
 var Settings = require('settings');
-var myQ = new require('myQ')();
+var myQLib = require('myQ');
+myQLib.ajax = require('ajax'); // here to make testing easier
+var myQ = new myQLib();
 
 var emailAddress = '';
 var password = '';
@@ -87,7 +88,7 @@ main.on('click', 'select', function(e) {
 
 main.on('click', 'down', function(e) {
   var card = new UI.Card();
-
+  console.log('calling authenticate');
   myQ.authenticate(emailAddress, password, function(data) {
     console.log('success callback');
     card.title('Logged In');

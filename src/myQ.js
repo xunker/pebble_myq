@@ -1,46 +1,62 @@
 function myQ() {
-  var appId = 'Vj8pQggXLhLy0WHahglCD4N1nAkkXQtGYpq2HrHD7H1nvmbT55KqtN6RSF4ILB%2fi';
-  var baseUrl = 'https://myqexternal.myqdevice.com/';
   this.securityToken = undefined;
 }
 
-myQ.prototype.isAuthenticated = function() {
-  return !!this.securityToken;
-};
+myQ.log = function(msg) {
+  console.log("myQ: " + msg);
+}
 
-myQ.prototype.authenticateUrl = function() {
+myQ.prototype.log = function(msg) {
+  myQ.log(msg);
+}
+
+myQ.appId = 'Vj8pQggXLhLy0WHahglCD4N1nAkkXQtGYpq2HrHD7H1nvmbT55KqtN6RSF4ILB%2fi';
+myQ.baseUrl = 'https://myqexternal.myqdevice.com/';
+
+myQ.authenticateUrl = function(emailAddress, password) {
+  this.log('.authenticateUrl');
   return this.baseUrl
     + 'Membership/ValidateUserWithCulture?appId='
     + this.appId
     + '&securityToken=null&username='
-    + encodeURI(this.emailAddress)
+    + encodeURI(emailAddress)
     + '&password='
-    + encodeURI(this.password)
+    + encodeURI(password)
     + '&culture=en';
 };
 
-myQ.prototype.authenticate = function(emailAddress, password, success, failure, error) {
-  
-  ajax(
-    { url: this.authenticateUrl(), type: 'json' },
+myQ.prototype.isAuthenticated = function() {
+  this.log('#isAuthenticated');
+  return !!this.securityToken;
+};
+
+myQ.prototype.authenticate = function(emailAddress, password, success_cb, failure_cb, error_cb) {
+  console.log('myQ#authenticate');
+  var authUrl = myQ.authenticateUrl(emailAddress, password);
+  console.log('url: ' + authUrl);
+  myQ.ajax(
+    { url: authUrl, type: 'json' },
     function(data) {
       console.log('received log in response');
+      console.log(JSON.stringify(data));
       if (data.SecurityToken) {
         console.log('Log in successful');
         this.securityToken = data.SecurityToken;
-        success(data);
+        success_cb(data);
       } else {
         console.log('Log in failure');
         this.securityToken = undefined;
-        failure(data);
+        failure_cb(data);
       }
     },
-    function(err) {
+    function(msg) {
+      console.log(JSON.stringify(msg));
       console.log('log in error');
       this.securityToken = undefined;
-      error(err);
+      error_cb(msg);
     }
   );
+  return true;
 };
 
 module.exports = myQ;
