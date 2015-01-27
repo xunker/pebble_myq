@@ -1,5 +1,4 @@
 function myQ() {
-  this.securityToken = undefined;
 }
 
 myQ.log = function(msg) {

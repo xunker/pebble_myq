@@ -16,8 +16,15 @@ var password = '';
 
 var loadSettings = function() {
   console.log('Loading settings');
+  console.log(JSON.stringify(Settings.option()));
   emailAddress = Settings.option().emailAddress;
+  console.log('EmailAddress: ' + emailAddress);
   password = Settings.option().password;
+  console.log('password: ' + password);
+};
+
+var haveStoredCredentials = function() {
+  return !!(emailAddress && password);
 };
 
 Settings.config(
@@ -39,21 +46,35 @@ Settings.config(
       Settings.option('password', e.options.password);
     }
     console.log('Done');
-    loadSettings();
+    main();
   }
 );
 
-var main = new UI.Card({
+var pleaseConfigureCard = new UI.Card({
+  body: 'You myQ email address and password are not set yet. Please configure the app on your phone first.'
+});
+
+var mainCard = new UI.Card({
   title: 'Pebble.js',
   icon: 'images/garage-door.png',
   subtitle: 'Hello World!',
   body: 'Press any button.'
 });
 
-loadSettings();
-main.show();
+var main = function() {
+  loadSettings();
+  if (haveStoredCredentials()) {
+    mainCard.show();
+    pleaseConfigureCard.hide();
+  } else {
+    pleaseConfigureCard.show();
+    mainCard.hide();
+  }
+};
 
-main.on('click', 'up', function(e) {
+main();
+
+mainCard.on('click', 'up', function(e) {
   var menu = new UI.Menu({
     sections: [{
       items: [{
@@ -73,7 +94,15 @@ main.on('click', 'up', function(e) {
   menu.show();
 });
 
-main.on('click', 'select', function(e) {
+mainCard.on('longClick', 'up', function(e) {
+  console.log('Resetting settings.');
+  Settings.option('emailAddress', null);
+  Settings.option('password', null);
+  console.log('Done resetting.');
+  main();
+});
+
+mainCard.on('click', 'select', function(e) {
   var wind = new UI.Window();
   var textfield = new UI.Text({
     position: new Vector2(0, 50),
@@ -86,7 +115,7 @@ main.on('click', 'select', function(e) {
   wind.show();
 });
 
-main.on('click', 'down', function(e) {
+mainCard.on('click', 'down', function(e) {
   var card = new UI.Card();
   console.log('calling authenticate');
   myQ.authenticate(emailAddress, password, function(data) {
@@ -109,7 +138,4 @@ main.on('click', 'down', function(e) {
       card.show();
     }
   );
-  
-
-
 });

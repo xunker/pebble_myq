@@ -4,7 +4,7 @@
         "configurable"
     ],
     "companyName": "xunker@pyxidis.org",
-    "longName": "MyQ Pebble.js",
+    "longName": "Pebble MyQ",
     "projectType": "pebblejs",
     "resources": {
         "media": [
@@ -36,7 +36,7 @@
             }
         ]
     },
-    "shortName": "MyQ Pebble.js",
+    "shortName": "pebble_myq",
     "uuid": "276062b6-2748-4cc3-b905-4092023d927d",
     "versionCode": 1,
     "versionLabel": "1.0",
