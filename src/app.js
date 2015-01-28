@@ -152,20 +152,33 @@ mainCard.on('longClick', 'up', function(e) {
   main();
 });
 
+var showLoadingCard = function() {
+  var loadingCard = new UI.Card({
+    subtitle: 'Loading...'
+  });
+  loadingCard.show();
+  return loadingCard;
+};
+
 mainCard.on('click', 'select', function(e) {
+  var loadingCard = showLoadingCard();
+
   var card = new UI.Card();
   console.log('calling getDevices');
   myQ.getDevices(function(data) {
     console.log('devices success callback');
+    loadingCard.hide();
     card.title('Number of Devices');
     card.body(data.Devices.length);
     card.show();
   }, function(data) {
     console.log('devices failure callback');
+    loadingCard.hide();
     card.title('Problem getting devices');
     card.show();
   }, function(error) {
       console.log('devices error callback');
+      loadingCard.hide();
       card.title('Error!');
       card.subtitle('Error getting devices');
       card.body('No idea why.');
