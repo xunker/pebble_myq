@@ -30,23 +30,23 @@ myQ.prototype.isAuthenticated = function() {
 };
 
 myQ.prototype.authenticate = function(emailAddress, password, success_cb, failure_cb, error_cb) {
-  console.log('myQ#authenticate');
+  this.log('myQ#authenticate');
   var authUrl = myQ.authenticateUrl(emailAddress, password);
-  console.log('url: ' + authUrl);
+  this.log('url: ' + authUrl);
   // success and failure callbacks below are wrapped in closures
   // so we can set securityToken on the instance of myQ.
   myQ.ajax(
     { url: authUrl, type: 'json' },
     (function(_this){
       return function(data) {
-        console.log('received log in response');
-        console.log(JSON.stringify(data));
+        _this.log('received log in response');
+        _this.log(JSON.stringify(data));
         if (data.SecurityToken) {
-          console.log('Log in successful');
+          _this.log('Log in successful');
           _this.securityToken = data.SecurityToken;
           success_cb(data);
         } else {
-          console.log('Log in failure');
+          _this.log('Log in failure');
           _this.securityToken = undefined;
           failure_cb(data);
         }
@@ -54,9 +54,9 @@ myQ.prototype.authenticate = function(emailAddress, password, success_cb, failur
     })(this),
     (function(_this){
       return function(msg) {
-        console.log(JSON.stringify(msg));
-        console.log('log in error');
-        this.securityToken = undefined;
+        _this.log(JSON.stringify(msg));
+        _this.log('log in error');
+        _this.securityToken = undefined;
         error_cb(msg);
       };
     })(this)
@@ -74,27 +74,33 @@ myQ.devicesUrl = function(token) {
 };
 
 myQ.prototype.getDevices = function(success_cb, failure_cb, error_cb) {
-  console.log('myQ#getDevices');
+  this.log('myQ#getDevices');
   var devicesUrl = myQ.devicesUrl(this.securityToken);
-  console.log('url: ' + devicesUrl);
+  this.log('url: ' + devicesUrl);
+  // success and failure callbacks below are wrapped in closures
+  // so we can set use methods on myQ instance.
   myQ.ajax(
     { url: devicesUrl, type: 'json' },
-    function(data) {
-      console.log('received devices response');
-      console.log(JSON.stringify(data));
-      if (data.ReturnCode == "0") {
-        console.log('got device list');
-        success_cb(data);
-      } else {
-        console.log('no device list');
-        failure_cb(data);
-      }
-    },
-    function(msg) {
-      console.log(JSON.stringify(msg));
-      console.log('devices error');
-      error_cb(msg);
-    }
+    (function(_this){
+      return function(data) {
+        _this.log('received devices response');
+        _this.log(JSON.stringify(data));
+        if (data.ReturnCode == "0") {
+          _this.log('got device list');
+          success_cb(data);
+        } else {
+          _this.log('no device list');
+          failure_cb(data);
+        }
+      };
+    })(this),
+    (function(_this){
+      return function(msg) {
+        _this.log(JSON.stringify(msg));
+        _this.log('devices error');
+        error_cb(msg);
+      };
+    })(this)
   );
   return true;
 };
