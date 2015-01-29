@@ -68,7 +68,7 @@ myQ.prototype.authenticate = function(emailAddress, password, callbacks) {
 };
 
 myQ.devicesUrl = function(token) {
-  this.log('.authenticateUrl');
+  this.log('.devicesUrl');
   return this.baseUrl
     + 'api/UserDeviceDetails?appId='
     + this.appId
@@ -77,37 +77,44 @@ myQ.devicesUrl = function(token) {
 };
 
 myQ.prototype.getDevices = function(callbacks) {
+  this.log('#getDevices');
   callbacks = callbacks || {};
-  this.log('myQ#getDevices');
-  var devicesUrl = myQ.devicesUrl(this.securityToken);
-  this.log('url: ' + devicesUrl);
-  // success and failure callbacks below are wrapped in closures
-  // so we can set use methods on myQ instance.
-  myQ.ajax(
-    { url: devicesUrl, type: 'json' },
-    (function(_this, callbacks){
-      return function(data) {
-        _this.log('received devices response');
-        // _this.log(JSON.stringify(data));
-        if (data.ReturnCode == "0") {
-          _this.log('got device list');
-          if (callbacks["success"]) { callbacks["success"](data); }
-        } else {
-          _this.log('no device list');
-          if (callbacks["failure"]) { callbacks["failure"](data); }
-        }
-        if (callbacks["always"]) { callbacks["always"](); }
-      };
-    })(this, callbacks),
-    (function(_this, callbacks){
-      return function(msg) {
-        _this.log(JSON.stringify(msg));
-        _this.log('devices error');
-        if (callbacks["error"]) { callbacks["error"](msg); }
-        if (callbacks["always"]) { callbacks["always"](); }
-      };
-    })(this, callbacks)
-  );
+  if (this.devicesData) {
+    this.log('using cached devices list');
+    if (callbacks["success"]) { callbacks["success"](this.devicesData); }
+    if (callbacks["always"]) { callbacks["always"](); }
+  } else {
+    var devicesUrl = myQ.devicesUrl(this.securityToken);
+    this.log('url: ' + devicesUrl);
+    // success and failure callbacks below are wrapped in closures
+    // so we can set use methods on myQ instance.
+    myQ.ajax(
+      { url: devicesUrl, type: 'json' },
+      (function(_this, callbacks){
+        return function(data) {
+          _this.log('received devices response');
+          // _this.log(JSON.stringify(data));
+          if (data.ReturnCode == "0") {
+            _this.log('got device list');
+            _this.devicesData = data;
+            if (callbacks["success"]) { callbacks["success"](data); }
+          } else {
+            _this.log('no device list');
+            if (callbacks["failure"]) { callbacks["failure"](data); }
+          }
+          if (callbacks["always"]) { callbacks["always"](); }
+        };
+      })(this, callbacks),
+      (function(_this, callbacks){
+        return function(msg) {
+          _this.log(JSON.stringify(msg));
+          _this.log('devices error');
+          if (callbacks["error"]) { callbacks["error"](msg); }
+          if (callbacks["always"]) { callbacks["always"](); }
+        };
+      })(this, callbacks)
+    );
+  }
   return true;
 };
 
