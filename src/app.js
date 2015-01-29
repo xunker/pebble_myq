@@ -170,22 +170,23 @@ mainCard.on('click', 'select', function(e) {
   myQ.getDevices({
     "success": function(data) {
       console.log('devices success callback');
-      loadingCard.hide();
       card.title('Number of Devices');
       card.body(data.Devices.length);
       card.show();
     }, "failure": function(data) {
       console.log('devices failure callback');
-      loadingCard.hide();
+      
       card.title('Problem getting devices');
       card.show();
     }, "error": function(error) {
       console.log('devices error callback');
-      loadingCard.hide();
       card.title('Error!');
       card.subtitle('Error getting devices');
       card.body('No idea why.');
       card.show();
+    }, "always": function() {
+      console.log("devices always callback");
+      loadingCard.hide();
     }
   });
 });
