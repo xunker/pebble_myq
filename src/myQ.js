@@ -30,7 +30,6 @@ myQ.prototype.isAuthenticated = function() {
 };
 
 myQ.prototype.authenticate = function(emailAddress, password, opts) {
-  // success_cb, failure_cb, error_cb) {
   opts = opts || {};
   this.log('myQ#authenticate');
   var authUrl = myQ.authenticateUrl(emailAddress, password);
@@ -77,7 +76,8 @@ myQ.devicesUrl = function(token) {
     + token;
 };
 
-myQ.prototype.getDevices = function(success_cb, failure_cb, error_cb) {
+myQ.prototype.getDevices = function(opts) {
+  opts = opts || {};
   this.log('myQ#getDevices');
   var devicesUrl = myQ.devicesUrl(this.securityToken);
   this.log('url: ' + devicesUrl);
@@ -91,10 +91,10 @@ myQ.prototype.getDevices = function(success_cb, failure_cb, error_cb) {
         _this.log(JSON.stringify(data));
         if (data.ReturnCode == "0") {
           _this.log('got device list');
-          success_cb(data);
+          if (opts["success"]) { opts["success"](data); }
         } else {
           _this.log('no device list');
-          failure_cb(data);
+          if (opts["failure"]) { opts["failure"](data); }
         }
       };
     })(this),
@@ -102,7 +102,7 @@ myQ.prototype.getDevices = function(success_cb, failure_cb, error_cb) {
       return function(msg) {
         _this.log(JSON.stringify(msg));
         _this.log('devices error');
-        error_cb(msg);
+        if (opts["error"]) { opts["error"](msg); }
       };
     })(this)
   );
