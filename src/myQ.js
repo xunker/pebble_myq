@@ -29,7 +29,9 @@ myQ.prototype.isAuthenticated = function() {
   return !!this.securityToken;
 };
 
-myQ.prototype.authenticate = function(emailAddress, password, success_cb, failure_cb, error_cb) {
+myQ.prototype.authenticate = function(emailAddress, password, opts) {
+  // success_cb, failure_cb, error_cb) {
+  opts = opts || {};
   this.log('myQ#authenticate');
   var authUrl = myQ.authenticateUrl(emailAddress, password);
   this.log('url: ' + authUrl);
@@ -44,12 +46,13 @@ myQ.prototype.authenticate = function(emailAddress, password, success_cb, failur
         if (data.SecurityToken) {
           _this.log('Log in successful');
           _this.securityToken = data.SecurityToken;
-          success_cb(data);
+          if (opts["success"]) { opts["success"](data); }
         } else {
           _this.log('Log in failure');
           _this.securityToken = undefined;
-          failure_cb(data);
+          if (opts["failure"]) { opts["failure"](data); }
         }
+        if (opts["always"]) { opts["always"](); }
       };
     })(this),
     (function(_this){
@@ -57,7 +60,8 @@ myQ.prototype.authenticate = function(emailAddress, password, success_cb, failur
         _this.log(JSON.stringify(msg));
         _this.log('log in error');
         _this.securityToken = undefined;
-        error_cb(msg);
+        if (opts["error"]) { opts["error"](msg); }
+        if (opts["always"]) { opts["always"](); }
       };
     })(this)
   );

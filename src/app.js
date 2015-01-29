@@ -76,27 +76,26 @@ var authenticateUser = function() {
   authenticatingCard.show();
 
   console.log('calling authenticate');
-  myQ.authenticate(emailAddress, password, function(data) {
-    console.log('success callback');
-    authenticatingCard.hide();
-  }, function(data) {
-    console.log('failure callback');
-    authenticatingCard.hide();
+  myQ.authenticate(emailAddress, password, {
+    "success": function(data) {
+      console.log('success callback');
+    },
+    "failure": function(data) {
+      console.log('failure callback');
 
-    var msg = 'Unknown problem.';
-    if (data.ErrorMessage) {
-      msg = data.ErrorMessage;
-    }
+      var msg = 'Unknown problem.';
+      if (data.ErrorMessage) {
+        msg = data.ErrorMessage;
+      }
 
-    var failureCard = new UI.Card({
-      subtitle: 'Problem logging in',
-      body: msg
-    });
-    
-    failureCard.show();
-  }, function(error) {
+      var failureCard = new UI.Card({
+        subtitle: 'Problem logging in',
+        body: msg
+      });
+      
+      failureCard.show();
+    }, "error": function(error) {
       console.log('error callback');
-      authenticatingCard.hide();
 
       var msg = 'Unknown problem.';
       if (data.ErrorMessage) {
@@ -108,8 +107,11 @@ var authenticateUser = function() {
       });
 
       errorCard.show();
+    }, "always": function() {
+      console.log("always callback");
+      authenticatingCard.hide();
     }
-  );
+  });
 
 };
 

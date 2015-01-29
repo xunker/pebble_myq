@@ -39,7 +39,7 @@ describe("myQ", function() {
 
     it('calls .ajax with options and callbacks', function() {
       spyOn(myQ, 'ajax');
-      subject.authenticate(emailAddress, password, successCB, failureCB);
+      subject.authenticate(emailAddress, password, { "success": successCB, "failure": failureCB });
       expect(myQ.ajax).toHaveBeenCalledWith(
         { url: myQ.authenticateUrl(emailAddress, password), type: 'json' },
         jasmine.any(Function), jasmine.any(Function)
@@ -56,15 +56,16 @@ describe("myQ", function() {
       });
 
       it('sets #securityToken on the instance', function() {
-        subject.authenticate(null, null, function(){}, null);
+        subject.authenticate(null, null, { "success": function(){} });
         expect(subject.securityToken).toEqual("xxx");
       });
       it('executes the success callback', function() {
         var observer = {callback: function(){}};
         spyOn(observer, 'callback');
-        subject.authenticate(null, null, function() { observer.callback() }, null);
+        subject.authenticate(null, null, { "success": function() { observer.callback() } });
         expect(observer.callback).toHaveBeenCalled();
       });
+      it('executes the always callback');
     });
     describe("invalid credentials", function() {
       beforeEach(function() {
@@ -73,15 +74,16 @@ describe("myQ", function() {
       });
 
       it('clears #securityToken on the instance', function() {
-        subject.authenticate(null, null, null, function(){});
+        subject.authenticate(null, null, { "failure": function(){} });
         expect(subject.securityToken).toEqual(undefined);
       });
       it('executes the failure callback', function() {
         var observer = {callback: function(){}};
         spyOn(observer, 'callback');
-        subject.authenticate(null, null, null, function() { observer.callback() });
+        subject.authenticate(null, null, { "failure": function() { observer.callback() } });
         expect(observer.callback).toHaveBeenCalled();
       });
+      it('executes the always callback');
     });
     describe("request error", function() {
       beforeEach(function() {
@@ -90,15 +92,16 @@ describe("myQ", function() {
       });
 
       it('clears #securityToken on the instance', function() {
-        subject.authenticate(null, null, null, null, function(){});
+        subject.authenticate(null, null, { "error": function(){} });
         expect(subject.securityToken).toEqual(undefined);
       });
       it('executes the error callback', function() {
         var observer = {callback: function(){}};
         spyOn(observer, 'callback');
-        subject.authenticate(null, null, null, null, function() { observer.callback() });
+        subject.authenticate(null, null, { "error": function() { observer.callback() } });
         expect(observer.callback).toHaveBeenCalled();
       });
+      it('executes the always callback');
     });
   });
 
