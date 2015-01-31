@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>xxx</title>
+    <style>
+      .storage { display: none; }
+      .card-container {
+        width: 400px;
+        border-bottom: 1px solid grey;
+      }
+
+      .card-container .controls {
+        border: 1px solid blue;
+        width: 200px;
+        float:right;
+      }      
+
+      .card-container.hidden .controls .buttons a {
+        display:none;
+      }
+
+      .card-container .controls .buttons .hidden {
+        display:none;
+      }
+
+      .card-container .card {
+        font-family: monospace;
+        width: 168px;
+        height: 144px;
+        border: 1px solid black;
+        background: black;
+        margin: 5px;
+      }
+      .card-container .card .status-bar {
+        height: 12px;
+        background: black;
+        color: white;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .card-container .card .content {
+        border-radius: 4px;
+        height: 122px;
+        background: white;
+        padding: 5px;
+      }
+
+      .card-container .card .content .icon {
+        float: left;
+      }
+
+      .card-container .card .content .title {
+        font-size: 21px;
+      }
+
+      .card-container .card .content .subtitle {
+        font-size: 18px;
+      }
+
+      .card-container .card .content .body {
+        font-size: 15px;
+      }
+
+      .card-container .card .content .section .item {
+        border-bottom: 1px solid black;
+      }
+
+      .card-container .card .content .section {
+        border-bottom: 2px solid black;
+      }
+
+      .card-container .card .content .section .item .title {
+        font-size: 18px;
+      }
+
+      .card-container .card .content .section .item .subtitle {
+        font-size: 13px;
+      }
+
+      .card-container.hidden {
+        /*display: none;*/
+        opacity: 0.25;
+      }
+
+      .storage { display: none; }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script>
+      var module = {};
+    </script>
+    <script src="./myQ.js"></script>
+    <script src="./interface.js"></script>
+    <script>
+      
+      var Ajax = function(opts, success, failure) {
+        opts.success = success;
+        opts.failure = failure;
+        opts.method = opts.method || 'GET';
+        $.ajax(opts);
+      };
+
+      var Settings = {
+        config: function() {},
+        option: function() { return { emailAddress: 'xunker@pyxidis.org', password: 'Richm0nd' }; }
+      };
+
+      var activeCard = function(card) {
+        $('.watch .card-container').addClass('hidden');
+        if (card) {
+          $(card).removeClass('hidden');
+        } else { $('.watch .card-container').first().removeClass('hidden'); }
+      }
+
+      var UI = {
+        Card: function(opts) {
+          opts = opts || {};
+          opts.name = opts.name || 'unnamed card';
+          cardEl = $(".storage .card-container").clone();
+          if (opts.name) { cardEl.find('.card-name').text(opts.name); }
+          if (opts.icon) {
+            icon = $("<img class='icon' src='../resources/" + opts.icon + "'/>");
+            cardEl.find('.content').append(icon);
+          }
+          if (opts.title) {
+            title = $("<div class='title'/>");
+            title.text(opts.title);
+            cardEl.find('.content').append(title);
+          }
+          if (opts.subtitle) {
+            subtitle = $("<div class='subtitle'/>");
+            subtitle.text(opts.subtitle);
+            cardEl.find('.content').append(subtitle);
+          }
+          if (opts.body) {
+            body = $("<div class='body'/>");
+            body.text(opts.body);
+            cardEl.find('.content').append(body);
+          }
+
+          cardEl.title = function(value) {
+            title = $("<div class='title'/>");
+            title.text(value);
+            cardEl.find('.content').append(title);
+          }
+          cardEl.body = function(value) {
+            body = $("<div class='body'/>");
+            body.text(value);
+            cardEl.find('.content').append(body);
+          }
+          cardEl.show = function() {
+            console.log("Showing: ");
+            console.log(this);
+            activeCard(this);
+          };
+          cardEl.hide = function() {
+            // this.addClass('hidden');
+            console.log("Hiding: ");
+            console.log(this);
+            this.remove();
+            activeCard();
+          };
+          cardEl.on = function(eventName, buttonName, eventHandler) {
+            if (eventHandler) {
+              var btnSelector = '.buttons .' + buttonName + ' .' + eventName;
+              $(this[0]).find(btnSelector).removeClass('hidden');
+              $(this[0]).on(buttonName + eventName, eventHandler);
+            } else {
+              $(this[0]).on(eventName, buttonName);
+            }
+          };
+          $('.watch').prepend(cardEl);
+          return cardEl;
+        },
+        Menu: function(opts) {
+          cardEl = UI.Card(opts);
+          $.each((opts.sections || []), function(sectionIndex, section) {
+            var sectionEl = $('<div class="section"></div>');
+            $.each((section.items || []), function(itemIndex, item) {
+              console.log('item');
+              console.log(item);
+              var itemEl = $('<div class="item"></div>');
+              if (item.icon) {
+                icon = $("<img class='icon' src='../resources/" + item.icon + "'/>");
+                itemEl.append(icon);
+              }
+              if (item.title) {
+                title = $("<div class='title'/>");
+                title.text(item.title);
+                itemEl.append(title);
+              }
+              if (item.subtitle) {
+                subtitle = $("<div class='subtitle'/>");
+                subtitle.text(item.subtitle);
+                itemEl.append(subtitle);
+              }
+              sectionEl.append(itemEl);
+            });
+            cardEl.find('.content').append(sectionEl);
+          });
+          $('.watch').prepend(cardEl);
+          return cardEl;
+        }
+      };
+
+      $(document).ready(function() {
+        $(document.body).on('click', '.card-container .controls .buttons a', function(event) {
+          event.preventDefault();
+          var target = $(event.target);
+          var clickType = target.data('click-type');
+          var buttonName = target.parent().parent().data('button-name');
+          target.parent().parent().parent().parent().parent().parent('.card-container').trigger(
+            buttonName + clickType
+          );
+        });
+
+        $(document.body).on('click', '.card-container .controls a.back-button', function(event) {
+          event.preventDefault();
+          if ($('.watch .card-container').length > 1) {
+            var target = $(event.target);
+            var clickType = target.data('click-type');
+            var buttonName = target.parent().parent().data('button-name');
+            target.parent().parent().parent('.card-container').remove();
+            activeCard();
+          } else {
+            alert('This would exit the app.');
+          }
+        });
+
+        myQ.ajax = Ajax;
+
+        Interface(Settings, UI, new myQ());
+      });
+    </script>
+
+  </head>
+  <body>
+    <div class="storage">
+      <div class='card-container hidden'>
+        <div class="controls">
+          <table class="buttons">
+            <tr class="up" data-button-name="up">
+              <td>Up</td>
+              <td><a href="#" class="hidden click" data-click-type="click">Click</a></td>
+              <td><a href="#" class="hidden longClick" data-click-type="longClick">Long Click</a></td>
+            </tr>
+            <tr class="select" data-button-name="select">
+              <td>Select</td>
+              <td><a href="#" class="hidden click" data-click-type="click">Click</a></td>
+              <td><a href="#" class="hidden longClick" data-click-type="longClick">Long Click</a></td>
+            </tr>
+            <tr class="down" data-button-name="down">
+              <td>Down</td>
+              <td><a href="#" class="hidden click" data-click-type="click">Click</a></td>
+              <td><a href="#" class="hidden longClick" data-click-type="longClick">Long Click</a></td>
+            </tr>
+          </table>
+          <div><a href="#" class="back-button">Back</a></div>
+          <div>Card Name: <span class="card-name"></span></div>
+        </div>
+        <div class='card'>
+          <div class='status-bar'>12:12</div>
+          <div class='content'></div>
+        </div>
+        
+      </div>
+    </div>
+    <div class="watch"></div>
+  </body>
+</html>
