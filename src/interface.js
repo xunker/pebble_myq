@@ -5,7 +5,6 @@ myQLib.ajax = require('ajax'); // here to make testing easier
 
 interface(require('settings'), require('ui'), new myQLib());
 */
-var module = function() {};
 
 function Interface(Settings, UI, myQ) {
   var emailAddress = '';
