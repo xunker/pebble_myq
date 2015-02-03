@@ -1,11 +1,3 @@
-/*
-var Interface = require('interface');
-var myQLib = require('myQ');
-myQLib.ajax = require('ajax'); // here to make testing easier
-
-interface(require('settings'), require('ui'), new myQLib());
-*/
-
 function Interface(Settings, UI, myQ) {
   var emailAddress = '';
   var password = '';
