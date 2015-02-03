@@ -5,7 +5,7 @@ var UI = {
     cardEl = $(".storage .card-container").clone();
     if (opts.name) { cardEl.find('.card-name').text(opts.name); }
     if (opts.icon) {
-      icon = $("<img class='icon' src='/resources/images/" + opts.icon + "'/>");
+      icon = $("<img class='icon' src='/resources/" + opts.icon + "'/>");
       cardEl.find('.content').append(icon);
     }
     if (opts.title) {
@@ -67,7 +67,7 @@ var UI = {
         console.log(item);
         var itemEl = $('<div class="item"></div>');
         if (item.icon) {
-          icon = $("<img class='icon' src='/resources/images" + item.icon + "'/>");
+          icon = $("<img class='icon' src='/resources/" + item.icon + "'/>");
           itemEl.append(icon);
         }
         if (item.title) {
