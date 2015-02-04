@@ -29,6 +29,11 @@ var UI = {
       title.text(value);
       cardEl.find('.content').append(title);
     }
+    cardEl.subtitle = function(value) {
+      subtitle = $("<div class='subtitle'/>");
+      subtitle.text(value);
+      cardEl.find('.content').append(subtitle);
+    }
     cardEl.body = function(value) {
       body = $("<div class='body'/>");
       body.text(value);
