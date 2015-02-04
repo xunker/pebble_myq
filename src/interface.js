@@ -88,13 +88,9 @@ function Interface(Settings, UI, myQ) {
       }, "error": function(error) {
         console.log('error callback');
 
-        var msg = 'Unknown problem.';
-        if (data.ErrorMessage) {
-          msg = data.ErrorMessage;
-        }
         var errorCard = new UI.Card({
           subtitle: 'Problem logging in',
-          body: msg
+          body: error.statusText + ': ' + error.state()
         });
 
         errorCard.show();
